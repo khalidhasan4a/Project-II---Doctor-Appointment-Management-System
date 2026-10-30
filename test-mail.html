@@ -1,0 +1,20 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mail test</title>
+<body style="font-family:Arial;max-width:520px;margin:30px auto;padding:0 16px">
+<h2>Mail test</h2>
+<p>Web App URL (ends with /exec)<br><input id="u" style="width:100%"></p>
+<p>Token (same as TOKEN in Code.gs)<br><input id="t" style="width:100%"></p>
+<p>Send to<br><input id="e" style="width:100%" placeholder="your e-mail"></p>
+<button id="b">Send test</button>
+<pre id="o" style="white-space:pre-wrap;background:#eef;padding:10px;margin-top:16px">Result will show here</pre>
+<script>
+document.getElementById('b').onclick=function(){
+  var o=document.getElementById('o');o.textContent='Sending...';
+  fetch(document.getElementById('u').value.trim(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({token:document.getElementById('t').value.trim(),to:document.getElementById('e').value.trim(),subject:'Test from website',html:'<b>It works.</b>',name:'Test'})})
+  .then(function(r){return r.text()}).then(function(t){
+    t=t.trim();
+    o.textContent = t=='ok' ? 'OK - mail sent. Check inbox/Spam.' : /^</.test(t) ? 'Google returned a web page (login/error). Deployment access is not "Anyone", or wrong URL.\n\n'+t.slice(0,300) : 'Apps Script said: '+t;
+  }).catch(function(e){o.textContent='Request failed: '+e+'\nUsually: wrong URL, or access not "Anyone".'});
+};
+</script>
